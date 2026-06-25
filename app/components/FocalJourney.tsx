@@ -28,7 +28,7 @@ interface Service {
   details: string[];
 }
 
-const NAV_LABELS = ["HOME", "THE APPROACH", "PORT ARRIVAL", "INLAND", "SERVICES"];
+const NAV_LABELS = ["HOME", "THE APPROACH", "PILOTAGE", "PORT ARRIVAL", "DRY DOCK", "INLAND", "SERVICES"];
 
 export default function FocalJourney() {
   const canvas1Ref = useRef<HTMLCanvasElement>(null);
@@ -104,6 +104,12 @@ export default function FocalJourney() {
       }
       for (let i = 1; i <= TOTAL_FRAMES; i += batchSize) {
         await loadBatch(3, i, Math.min(i + batchSize - 1, TOTAL_FRAMES), () => {});
+      }
+      for (let i = 1; i <= TOTAL_FRAMES; i += batchSize) {
+        await loadBatch(4, i, Math.min(i + batchSize - 1, TOTAL_FRAMES), () => {});
+      }
+      for (let i = 1; i <= TOTAL_FRAMES; i += batchSize) {
+        await loadBatch(5, i, Math.min(i + batchSize - 1, TOTAL_FRAMES), () => {});
       }
     };
 
@@ -231,8 +237,24 @@ export default function FocalJourney() {
         fadeAndSwitchClip(2, 240);
       }
     } else if (activeSection === 3) {
-      if (prev === 2) fadeAndSwitchClip(3, 240, true);
+      if (prev === 2) {
+        fadeAndSwitchClip(3, 240, true);
+      } else {
+        fadeAndSwitchClip(3, 240);
+      }
     } else if (activeSection === 4) {
+      if (prev === 3) {
+        fadeAndSwitchClip(4, 240, true);
+      } else {
+        fadeAndSwitchClip(4, 240);
+      }
+    } else if (activeSection === 5) {
+      if (prev === 4) {
+        fadeAndSwitchClip(5, 240, true);
+      } else {
+        fadeAndSwitchClip(5, 240);
+      }
+    } else if (activeSection === 6) {
       animateStats();
     }
   }, [activeSection, clip1Ready]);
@@ -241,7 +263,7 @@ export default function FocalJourney() {
     const scrollTop = e.currentTarget.scrollTop;
     const clientHeight = e.currentTarget.clientHeight;
     const index = Math.round(scrollTop / clientHeight);
-    if (index !== activeSection && index >= 0 && index <= 4) setActiveSection(index);
+    if (index !== activeSection && index >= 0 && index <= 6) setActiveSection(index);
   };
 
   const animateStats = () => {
@@ -512,20 +534,17 @@ export default function FocalJourney() {
       {/* ── Canvas background ── */}
       <div
         className={`fixed inset-0 w-full h-full z-0 transition-opacity duration-700 ${
-          activeSection === 4 ? "opacity-0 pointer-events-none" : "opacity-100"
+          activeSection === 6 ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
         <canvas
-          ref={canvas1Ref}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
-            activeCanvas === 1 ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          ref={canvas2Ref}
+          className="absolute inset-0 w-full h-full object-cover"
         />
         <canvas
-          ref={canvas2Ref}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
-            activeCanvas === 2 ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          ref={canvas1Ref}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+          style={{ opacity: activeCanvas === 1 ? 1 : 0 }}
         />
         {/* Dark cinematic overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/65 pointer-events-none" />
@@ -589,7 +608,7 @@ export default function FocalJourney() {
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </button>
                 <button
-                  onClick={() => scrollToSection(4)}
+                  onClick={() => scrollToSection(6)}
                   className="flex items-center justify-center bg-white/10 hover:bg-white/18 border border-white/22 px-8 py-4 rounded-xl tracking-wider text-sm text-white transition-all"
                 >
                   OUR SERVICES
@@ -620,11 +639,8 @@ export default function FocalJourney() {
                   <stop offset="100%" stopColor="white" stopOpacity="0.08" />
                 </linearGradient>
               </defs>
-              {/* Main dashed course line */}
               <line x1="0" y1="450" x2="1010" y2="450" stroke="url(#courseGrad)" strokeWidth="1.5" strokeDasharray="10 7" />
-              {/* Secondary parallel wake */}
               <line x1="0" y1="462" x2="800" y2="462" stroke="white" strokeOpacity="0.06" strokeWidth="1" strokeDasharray="6 10" />
-              {/* Terminal marker where line meets the card */}
               <circle cx="1010" cy="450" r="4" fill="white" fillOpacity="0.28" />
               <circle cx="1010" cy="450" r="9" fill="none" stroke="white" strokeOpacity="0.14" strokeWidth="1" />
             </svg>
@@ -649,7 +665,7 @@ export default function FocalJourney() {
                 onClick={() => scrollToSection(2)}
                 className="group flex items-center gap-2 text-white hover:text-brand-yellow font-bold tracking-wider text-sm transition-colors w-fit mt-2"
               >
-                PROCEED TO PORT ENTRY
+                PROCEED TO PILOTAGE
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
@@ -657,11 +673,11 @@ export default function FocalJourney() {
         </section>
 
         {/* ════════════════════════
-            SECTION 2 — PORT ARRIVAL
+            SECTION 2 — PILOTAGE & INSPECTION
             ════════════════════════ */}
         <section className="h-screen w-full snap-start flex items-center relative px-6 md:px-16 lg:px-24 overflow-hidden">
 
-          {/* Course line from right — vessel now berthed, operations radiate outward */}
+          {/* Maritime course line — Pilotage */}
           <div className="absolute inset-0 pointer-events-none hidden lg:block">
             <svg className="w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
               <defs>
@@ -685,19 +701,19 @@ export default function FocalJourney() {
           }`}>
             <div className="col-span-1 lg:col-span-6 p-8 md:p-11 flex flex-col justify-center">
               <span className="text-brand-yellow font-mono tracking-wider text-[11px] uppercase font-semibold mb-3">
-                02 / PORT ARRIVAL
+                02 / PILOTAGE &amp; INSPECTION
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 tracking-tight text-white">
-                Modern Automated Harbor
+                Tugboat Assist &amp; Pilot Boarding
               </h2>
               <p className="text-sm md:text-base text-white/70 leading-relaxed mb-6 max-w-xl">
-                When a vessel enters the harbor, operations accelerate. We handle crane-loading schedules, crew rotations, cash deliveries, store provisions, and marine surveys.
+                Safeguarding harbor entry with experienced marine pilots, coordinated tugboat maneuvers, and port authority inspections.
               </p>
               <button
                 onClick={() => scrollToSection(3)}
                 className="group flex items-center gap-2 text-white hover:text-brand-yellow font-bold tracking-wider text-sm transition-colors w-fit mt-2"
               >
-                PROCEED TO INLAND TRANSIT
+                PROCEED TO PORT ARRIVAL
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
@@ -705,11 +721,11 @@ export default function FocalJourney() {
         </section>
 
         {/* ════════════════════════
-            SECTION 3 — INLAND DISTRIBUTION
+            SECTION 3 — PORT ARRIVAL
             ════════════════════════ */}
         <section className="h-screen w-full snap-start flex items-center relative px-6 md:px-16 lg:px-24 overflow-hidden">
 
-          {/* Course line from left — cargo route heading inland */}
+          {/* Course line from left — vessel now berthed */}
           <div className="absolute inset-0 pointer-events-none hidden lg:block">
             <svg className="w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
               <defs>
@@ -733,7 +749,103 @@ export default function FocalJourney() {
           }`}>
             <div className="col-span-1 lg:col-start-7 lg:col-span-6 p-8 md:p-11 flex flex-col justify-center">
               <span className="text-brand-yellow font-mono tracking-wider text-[11px] uppercase font-semibold mb-3">
-                03 / INLAND DISTRIBUTION
+                03 / PORT ARRIVAL
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 tracking-tight text-white">
+                Modern Automated Harbor
+              </h2>
+              <p className="text-sm md:text-base text-white/70 leading-relaxed mb-6 max-w-xl">
+                When a vessel enters the harbor, operations accelerate. We handle crane-loading schedules, crew rotations, cash deliveries, store provisions, and marine surveys.
+              </p>
+              <button
+                onClick={() => scrollToSection(4)}
+                className="group flex items-center gap-2 text-white hover:text-brand-yellow font-bold tracking-wider text-sm transition-colors w-fit mt-2"
+              >
+                PROCEED TO SHIPYARD
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════
+            SECTION 4 — DRY DOCK & MAINTENANCE
+            ════════════════════════ */}
+        <section className="h-screen w-full snap-start flex items-center relative px-6 md:px-16 lg:px-24 overflow-hidden">
+
+          {/* Maritime course line — Dry Dock */}
+          <div className="absolute inset-0 pointer-events-none hidden lg:block">
+            <svg className="w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="courseGrad4" x1="1" y1="0" x2="0" y2="0">
+                  <stop offset="0%" stopColor="white" stopOpacity="0" />
+                  <stop offset="65%" stopColor="white" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="white" stopOpacity="0.08" />
+                </linearGradient>
+              </defs>
+              <line x1="1440" y1="450" x2="430" y2="450" stroke="url(#courseGrad4)" strokeWidth="1.5" strokeDasharray="10 7" />
+              <line x1="1440" y1="462" x2="640" y2="462" stroke="white" strokeOpacity="0.06" strokeWidth="1" strokeDasharray="6 10" />
+              <circle cx="430" cy="450" r="4" fill="white" fillOpacity="0.28" />
+              <circle cx="430" cy="450" r="9" fill="none" stroke="white" strokeOpacity="0.14" strokeWidth="1" />
+            </svg>
+          </div>
+
+          <div className={`grid grid-cols-1 lg:grid-cols-12 w-full max-w-7xl mx-auto relative z-10 transition-all duration-1000 transform ${
+            currentClip === 4 && currentFrame >= TOTAL_FRAMES
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8 pointer-events-none"
+          }`}>
+            <div className="col-span-1 lg:col-span-6 p-8 md:p-11 flex flex-col justify-center">
+              <span className="text-brand-yellow font-mono tracking-wider text-[11px] uppercase font-semibold mb-3">
+                04 / DRY DOCK &amp; MAINTENANCE
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 tracking-tight text-white">
+                Shipyard Upgrades &amp; Green Tech
+              </h2>
+              <p className="text-sm md:text-base text-white/70 leading-relaxed mb-6 max-w-xl">
+                Managing dry dock inspections, hull cleaning, green technology upgrades, and sustainable vessel recycling coordination.
+              </p>
+              <button
+                onClick={() => scrollToSection(5)}
+                className="group flex items-center gap-2 text-white hover:text-brand-yellow font-bold tracking-wider text-sm transition-colors w-fit mt-2"
+              >
+                PROCEED TO INLAND TRANSIT
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ════════════════════════
+            SECTION 5 — INLAND DISTRIBUTION
+            ════════════════════════ */}
+        <section className="h-screen w-full snap-start flex items-center relative px-6 md:px-16 lg:px-24 overflow-hidden">
+
+          {/* Course line from left — cargo route heading inland */}
+          <div className="absolute inset-0 pointer-events-none hidden lg:block">
+            <svg className="w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="courseGrad5" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="white" stopOpacity="0" />
+                  <stop offset="65%" stopColor="white" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="white" stopOpacity="0.08" />
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="450" x2="1010" y2="450" stroke="url(#courseGrad5)" strokeWidth="1.5" strokeDasharray="10 7" />
+              <line x1="0" y1="438" x2="800" y2="438" stroke="white" strokeOpacity="0.06" strokeWidth="1" strokeDasharray="6 10" />
+              <circle cx="1010" cy="450" r="4" fill="white" fillOpacity="0.28" />
+              <circle cx="1010" cy="450" r="9" fill="none" stroke="white" strokeOpacity="0.14" strokeWidth="1" />
+            </svg>
+          </div>
+
+          <div className={`grid grid-cols-1 lg:grid-cols-12 w-full max-w-7xl mx-auto relative z-10 transition-all duration-1000 transform ${
+            currentClip === 5 && currentFrame >= TOTAL_FRAMES
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8 pointer-events-none"
+          }`}>
+            <div className="col-span-1 lg:col-start-7 lg:col-span-6 p-8 md:p-11 flex flex-col justify-center">
+              <span className="text-brand-yellow font-mono tracking-wider text-[11px] uppercase font-semibold mb-3">
+                05 / INLAND DISTRIBUTION
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 tracking-tight text-white">
                 Intermodal Last-Mile Delivery
@@ -742,7 +854,7 @@ export default function FocalJourney() {
                 From vessel deck to logistics semi-trucks, we coordinate inland transport seamlessly. Our global supply chain hubs ensure cargo reaches final networks safely and transparently.
               </p>
               <button
-                onClick={() => scrollToSection(4)}
+                onClick={() => scrollToSection(6)}
                 className="group flex items-center gap-2 text-brand-yellow hover:text-brand-yellow-hover font-bold tracking-wider text-sm transition-colors w-fit mt-2"
               >
                 ENTER CORPORATE HUB
